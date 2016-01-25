@@ -1,5 +1,3 @@
-set nocompatible              " be iMproved, required
-
 call plug#begin('~/.vim/plugged')
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
@@ -88,6 +86,11 @@ Plug 'junegunn/vim-easy-align'
 " A plugin to make it easier to use motions to jump
 " to words and characters:
 Plug 'easymotion/vim-easymotion'
+
+" A plugin to apply vim-airline's theme to tmux, and then
+" to snapshot the theme so that it can be loaded up into
+" tmux:
+Plug 'edkolev/tmuxline.vim'
 
 " All of your Plugins must be added before the following line
 call plug#end()            " required
@@ -199,6 +202,10 @@ let g:airline#extensions#tabline#fnamemod = ':t'
 " Don't show trailing whitespace warning:
 let g:airline_section_warning = ''
 
+" Use the powerline font symbols, for a nicer
+" look:
+let g:airline_powerline_fonts = 1
+
 " tagbar config. Enable it using this key map:
 nmap <F8> :TagbarToggle<CR>
 " Have it autofocus on open:
@@ -225,7 +232,8 @@ nmap <silent> <Leader>oH :FSSplitLeft<cr>
 map <leader>f :pyf /usr/share/vim/addons/syntax/clang-format-3.6.py<CR>
 
 " Mapping to close the file in the current buffer:
-nnoremap <leader>q :Sayonara!<CR>
+nnoremap <leader>q :Sayonara<cr>
+nnoremap <leader>Q :Sayonara!<cr>
 
 " Mapping for easy aligning on symbols:
 " Start interactive EasyAlign in visual mode (e.g. vipga)
@@ -252,8 +260,12 @@ let g:grepper     = {
 
 " Easy motion mappings to allow searching for one character:
 " s{char}to move to {char}
-nmap s <Plug>(easymotion-f)
-nmap <Leader>s <Plug>(easymotion-F)
+nmap s <Plug>(easymotion-bd-f)
+xmap s <Plug>(easymotion-bd-f)
+
+" Easymotion mapping to search for two characters
+nmap <Leader>s <Plug>(easymotion-s2)
+xmap <Leader>s <Plug>(easymotion-s2)
 
 " Move to line
 map <Leader>L <Plug>(easymotion-bd-jk)
