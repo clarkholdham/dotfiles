@@ -40,6 +40,11 @@ export TERMINAL=urxvt
 # Set ccache to use distcc:
 export CCACHE_PREFIX="distcc"
 
+# Set ccache directory
+export CCACHE_DIR=/home/choldham/workspace/opal2/ccache
+#export CCACHE_UMASK=002
+#export CCACHE_BASEDIR=~/workspace/opal2/build-release-clang
+
 # Ensure Google Test tests always show colour output:
 export GTEST_COLOR=yes
 
@@ -57,3 +62,9 @@ BASE16_SHELL="$HOME/.config/base16-shell/base16-flat.dark.sh"
 [[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Alias ninja build command for distcc
+alias n="ninja -j30 -l10"
+
+# Alias ls -ltr to ltr
+alias ltr="ls -ltr"

@@ -161,6 +161,9 @@ set ffs=unix,dos
 " Let YouCompleteMe use tag files for completion as well:
 let g:ycm_collect_identifiers_from_tags_files = 1
 
+" Disable YouCompleteMe preview window:
+let g:ycm_add_preview_to_completeopt=0
+
 " Turn off prompting to load .ycm_extra_conf.py:
 let g:ycm_confirm_extra_conf = 0
 
