@@ -27,7 +27,10 @@ antigen bundle rupa/z
 antigen bundle uvaes/fzf-marks
 
 # Load the theme.
-antigen theme agnoster
+antigen theme https://github.com/caiogondim/bullet-train-oh-my-zsh-theme bullet-train
+
+# Daly's old theme
+# antigen theme agnoster
 
 # Tell antigen that you're done.
 antigen apply
