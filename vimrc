@@ -39,6 +39,9 @@ Plug 'tomtom/tcomment_vim'
 " vim-airline: 'Lean & mean status/tabline for vim that's light as air.'
 Plug 'bling/vim-airline'
 
+" themes for vim-airline:
+Plug 'vim-airline/vim-airline-themes'
+
 " A plugin to switch between header and source files:
 Plug 'derekwyatt/vim-fswitch'
 
@@ -92,6 +95,10 @@ Plug 'easymotion/vim-easymotion'
 " tmux:
 Plug 'edkolev/tmuxline.vim'
 
+" An asynchronous plugin for linting various
+" file types:
+Plug 'benekastah/neomake'
+
 " All of your Plugins must be added before the following line
 call plug#end()            " required
 
@@ -141,6 +148,11 @@ set makeprg=ninja
 " A shortcut key to change to the build directory
 " and build the project:
 map <F7> :execute "cd ".g:build_dir<CR> :make<CR>
+
+" Disable Neomake for C and C++ files, since we use
+" YouCompleteMe for them:
+let g:neomake_cpp_enabled_makers = []
+let g:neomake_c_enabled_makers = []
 
 " Set up keyboard shortbuts for fzf, the fuzzy finder
 " This one searches all the files in the current git repo:
@@ -212,6 +224,9 @@ let g:airline_section_warning = ''
 " look:
 let g:airline_powerline_fonts = 1
 
+" Set airline theme:
+let g:airline_theme='base16'
+
 " tagbar config. Enable it using this key map:
 nmap <F8> :TagbarToggle<CR>
 " Have it autofocus on open:
@@ -253,16 +268,32 @@ nmap ga <Plug>(EasyAlign)
 " uses it to populate the search prompt:
 nmap gs  <plug>(GrepperOperator)
 xmap gs  <plug>(GrepperOperator)
+" A mapping to search for all occurrences of the word under
+" the cursor in the current file
+nnoremap <leader>gw   :Grepper -tool search_in_file -cword -noprompt<cr>
+" A mapping to search for all occurrences of the word the user enters
+" at the prompt in the current file:
+nnoremap <leader>gf   :Grepper -tool search_in_file<cr>
+" A mapping to search for the user-supplied string using git grep:
+nnoremap <leader>gg   :Grepper -tool git<cr>
 
-" Have git grep perform searches throughout the whole repo
-" regardless of the directory we are currently in, and also set
-" jumping and opening settings
+" Configure grepper. Of note, we configure git grep
+" to perform searches throughout the whole repo
+" regardless of the directory we are currently in. We also set
+" jumping and opening settings. Finally, we define an additional
+" tool, which performs grep only on the current file.
 let g:grepper     = {
-	\ 'open':    1,
-	\ 'jump':    0,
-	\ 'switch':  1,
-	\ 'git':     { 'grepprg': 'git grep -nI $* -- `git rev-parse --show-toplevel`'},
-   \ }
+	 \ 'tools': ['ag', 'git', 'grep', 'search_in_file'],
+	 \ 'open':    1,
+	 \ 'jump':    0,
+	 \ 'switch':  1,
+	 \ 'git':     { 'grepprg': 'git grep -nI $* -- `git rev-parse --show-toplevel`'},
+	 \ 'search_in_file': {
+	 \   'grepprg':    'grep -Hn $* $.',
+	 \   'grepformat': '%f:%l:%m',
+	 \   'escape':     '\$.*[]%#',
+	 \ },
+	 \ }
 
 " Easy motion mappings to allow searching for one character:
 " s{char}to move to {char}
