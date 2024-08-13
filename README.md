@@ -15,3 +15,5 @@ cd dotfiles
 ```
 
 3. Restart your terminal
+
+4. In first tmux session, run `prefix + I` to install plugins. See tmuux.conf for prefix key.

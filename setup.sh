@@ -11,6 +11,9 @@ sudo apt-get install stow zsh tmux fzf
 # install oh-my-zsh
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 
+# install tmux plugin manager
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
 # install fzf
 
 # Set up all of the configs:
