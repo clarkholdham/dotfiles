@@ -73,8 +73,14 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Conan 2.0 bullshit commented out for now
-#source $HOME/workspaces/ouster-perception/build/generators/x86_64/RelWithDebInfo/conanrun.sh
+# Conan 2.0 script if the file exists
+# stored in home workspaces usually
+CONAN_RUN="$HOME/workspaces/ouster-perception/build/generators/x86_64/RelWithDebInfo/conanrun.sh"
+if [[ "$USER" = "user" ]]; then
+  # if the user is user, then it's a container
+  CONAN_RUN="/workspaces/ouster-perception/build/generators/x86_64/RelWithDebInfo/conanrun.sh"
+fi
+[[ -f "$CONAN_RUN" ]] && source "$CONAN_RUN"
 
 # github copilot aliases
 # "github copilot suggest = ghcs and github copilot explain = ghce
