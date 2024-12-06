@@ -6,7 +6,7 @@
 base=$(dirname $(readlink -f $0))
 
 # install a few things
-sudo apt-get -y install stow zsh tmux fzf
+sudo apt-get -y install stow zsh tmux fzf keychain
 
 # install tmux plugin manager
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
