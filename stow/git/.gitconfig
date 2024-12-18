@@ -1,0 +1,16 @@
+[user]
+	name = Clark Holdham
+	email = clark.holdham@gmail.com
+
+; include only if a remote within the ouster namespace is present
+[includeIf "hasconfig:remote.*.url:git@gitlab.com:ouster/*/**"]
+	path = ~/.gitconfig-ouster
+
+[pull]
+	rebase = true
+
+[core]
+	editor = vi
+
+[init]
+	defaultBranch = main
