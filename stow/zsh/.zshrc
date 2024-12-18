@@ -5,8 +5,6 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Created by newuser for 5.8
-
 #aliases
 alias nv=nvim
 alias dcud="docker compose up -d"
@@ -16,63 +14,49 @@ alias dcp="docker compose pull"
 alias dl="docker logs"
 alias clean_branches="git fetch --all --prune && git branch -D $(git branch -vv | grep ': gone]'|  grep -v "\*" | awk '{ print $1; }')"
 
-# zplug stuff
-if [[ ! -d ~/.zplug ]];then
-  git clone https://github.com/zplug/zplug ~/.zplug
+# load zgenom
+source "${HOME}/.zgenom/zgenom.zsh"
+
+# Check for plugin and zgenom updates every 7 days
+# This does not increase the startup time.
+zgenom autoupdate
+
+if ! zgenom saved; then
+  # oh-my-zsh plugins
+  zgenom load oh-my-zsh plugins/git
+  zgenom load oh-my-zsh plugins/gitfast "Faster git command line completion"
+  zgenom load oh-my-zsh plugins/wd "Warp directory - easily switch to particular directories"
+  zgenom load oh-my-zsh plugins/command-not-found
+  zgenom load oh-my-zsh plugins/vi-mode
+  zgenom load oh-my-zsh lib/completion "Better tab completion"
+  zgenom load oh-my-zsh lib/directories "Provides the directory stack"
+  zgenom load oh-my-zsh lib/history "Provides history management"
+  zgenom load oh-my-zsh lib/completion "Provides completion of dot directories"
+  zgenom load oh-my-zsh lib/theme-and-appearance "Provides auto cd, and some other appearance things"
+  zgenom load oh-my-zsh plugins/docker
+
+  # Powerlevel10k theme
+  genom load romkatv/powerlevel10k --theme
+  # Syntax highlighting bundle.
+  zgenom load zsh-users/zsh-syntax-highlighting
+  # Autosuggestions bundle.
+  zgenom load zsh-users/zsh-autosuggestions "auto completion"
+  # fzf
+  zgenom load unixorn/fzf-zsh-plugin
+  # generate the init script from plugins above
+  zgenom save
+  # Compile your zsh files
+  zgenom compile "$HOME/.zshrc"
 fi
-source ~/.zplug/init.zsh
-
-# Bundles from robbyrussell's oh-my-zsh.
-zplug "plugins/git", from:oh-my-zsh
-zplug "plugins/gitfast", from:oh-my-zsh # Faster git command line completion
-zplug "plugins/wd", from:oh-my-zsh # Warp directory - easily switch to particular directories
-zplug "plugins/command-not-found", from:oh-my-zsh
-zplug "plugins/vi-mode", from:oh-my-zsh
-zplug "lib/completion", from:oh-my-zsh # Better tab completion
-zplug "lib/directories", from:oh-my-zsh # Provides the directory stack
-zplug "lib/history", from:oh-my-zsh # Provides history management
-zplug "lib/completion", from:oh-my-zsh # Provides completion of dot directories
-zplug "zsh-users/zsh-autosuggestions" # auto completion
-zplug "lib/theme-and-appearance", from:oh-my-zsh # Provides auto cd, and some other appearance things
-zplug "romkatv/powerlevel10k", as:theme, depth:1
-zplug "plugins/docker", from:oh-my-zsh
-
-# Syntax highlighting bundle.
-zplug "zsh-users/zsh-syntax-highlighting"
-
-if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
-    if read -q; then
-        echo; zplug install
-    fi
-fi
-
-zplug load
 
 # zsh-autosuggestions commands
 bindkey '^ ' autosuggest-execute
 bindkey '^h' history-beginning-search-backward
 bindkey '^j' history-beginning-search-backward
 
-# fzf keybindings and auto-completion
-source /usr/share/doc/fzf/examples/key-bindings.zsh
-source /usr/share/doc/fzf/examples/completion.zsh
-
+# Setup powerlevel10k
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-export PATH="$HOME/.poetry/bin:$PATH"
-export PATH="$HOME/scripts:$PATH"
-export PATH="$HOME/.local/bin:$PATH"
-
-# Path for some local binaries
-export PATH="$HOME/binaries:$PATH"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Conan 2.0 script if the file exists
 # stored in home workspaces usually
@@ -81,8 +65,6 @@ if [[ "$USER" = "user" ]]; then
   # if the user is user, then it's a container
   CONAN_RUN="/workspaces/ouster-perception/build/generators/x86_64/RelWithDebInfo/conanrun.sh"
 fi
-[[ -f "$CONAN_RUN" ]] && source "$CONAN_RUN"
-
-# github copilot aliases
-# "github copilot suggest = ghcs and github copilot explain = ghce
-#eval "$(gh copilot alias -- zsh)"
+if [[ -f "$CONAN_RUN" ]]; then
+  source "$CONAN_RUN"
+fi

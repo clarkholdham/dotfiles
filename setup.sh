@@ -6,10 +6,13 @@
 base=$(dirname $(readlink -f $0))
 
 # install a few things
-sudo apt-get -y install stow zsh tmux fzf keychain
+sudo apt-get -y install stow zsh tmux keychain
 
 # install tmux plugin manager
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+# Install zgenom
+git clone https://github.com/jandamm/zgenom.git "${HOME}/.zgenom"
 
 # Set up all of the configs:
 cd ${base}/stow
@@ -20,4 +23,4 @@ cd ${base}/stow
 # without having to modify this script.
 for app in */; do
 	stow -v -t ${HOME} $app
-done;
+done
