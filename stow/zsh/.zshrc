@@ -12,7 +12,9 @@ alias dcd="docker compose down"
 alias dcdv="docker compose down --volumes"
 alias dcp="docker compose pull"
 alias dl="docker logs"
-#alias clean_branches="git fetch --all --prune && git branch -D $(git branch -vv | grep ': gone]'|  grep -v "\*" | awk '{ print $1; }')"
+clean_branches() {
+  git fetch --all --prune && git branch -D $(git branch -vv | grep ': gone]'|  grep -v "\*" | awk '{ print $1; }')
+}
 
 # load zgenom
 source "${HOME}/.zgenom/zgenom.zsh"
