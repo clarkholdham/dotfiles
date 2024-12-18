@@ -12,7 +12,7 @@ alias dcd="docker compose down"
 alias dcdv="docker compose down --volumes"
 alias dcp="docker compose pull"
 alias dl="docker logs"
-alias clean_branches="git fetch --all --prune && git branch -D $(git branch -vv | grep ': gone]'|  grep -v "\*" | awk '{ print $1; }')"
+#alias clean_branches="git fetch --all --prune && git branch -D $(git branch -vv | grep ': gone]'|  grep -v "\*" | awk '{ print $1; }')"
 
 # load zgenom
 source "${HOME}/.zgenom/zgenom.zsh"
@@ -22,27 +22,29 @@ source "${HOME}/.zgenom/zgenom.zsh"
 zgenom autoupdate
 
 if ! zgenom saved; then
+  # Ohmyzsh base library
+  zgenom ohmyzsh
   # oh-my-zsh plugins
-  zgenom load oh-my-zsh plugins/git
-  zgenom load oh-my-zsh plugins/gitfast "Faster git command line completion"
-  zgenom load oh-my-zsh plugins/wd "Warp directory - easily switch to particular directories"
-  zgenom load oh-my-zsh plugins/command-not-found
-  zgenom load oh-my-zsh plugins/vi-mode
-  zgenom load oh-my-zsh lib/completion "Better tab completion"
-  zgenom load oh-my-zsh lib/directories "Provides the directory stack"
-  zgenom load oh-my-zsh lib/history "Provides history management"
-  zgenom load oh-my-zsh lib/completion "Provides completion of dot directories"
-  zgenom load oh-my-zsh lib/theme-and-appearance "Provides auto cd, and some other appearance things"
-  zgenom load oh-my-zsh plugins/docker
+  # Provides git aliases
+  zgenom oh-my-zsh plugins/git
+  # Faster git command line completion
+  zgenom oh-my-zsh plugins/gitfast
+  # Warp directory - easily switch to particular directories
+  zgenom oh-my-zsh plugins/wd
+  # Suggests packages to install if command not found
+  zgenom oh-my-zsh plugins/command-not-found
+  # Provides docker aliases
+  zgenom oh-my-zsh plugins/docker
 
   # Powerlevel10k theme
-  genom load romkatv/powerlevel10k --theme
+  zgenom load romkatv/powerlevel10k powerlevel10k
   # Syntax highlighting bundle.
   zgenom load zsh-users/zsh-syntax-highlighting
   # Autosuggestions bundle.
-  zgenom load zsh-users/zsh-autosuggestions "auto completion"
+  zgenom load zsh-users/zsh-autosuggestions
   # fzf
   zgenom load unixorn/fzf-zsh-plugin
+
   # generate the init script from plugins above
   zgenom save
   # Compile your zsh files
@@ -58,13 +60,8 @@ bindkey '^j' history-beginning-search-backward
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Conan 2.0 script if the file exists
-# stored in home workspaces usually
-CONAN_RUN="$HOME/workspaces/ouster-perception/build/generators/x86_64/RelWithDebInfo/conanrun.sh"
+# run conanrun.sh if it exists, only run in dev containers
 if [[ "$USER" = "user" ]]; then
   # if the user is user, then it's a container
-  CONAN_RUN="/workspaces/ouster-perception/build/generators/x86_64/RelWithDebInfo/conanrun.sh"
-fi
-if [[ -f "$CONAN_RUN" ]]; then
-  source "$CONAN_RUN"
+  source /workspaces/ouster-perception/build/generators/x86_64/RelWithDebInfo/conanrun.sh
 fi
