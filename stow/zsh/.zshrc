@@ -12,6 +12,7 @@ alias dcd="docker compose down"
 alias dcdv="docker compose down --volumes"
 alias dcp="docker compose pull"
 alias dl="docker logs"
+alias ls="ls -lah"
 clean_branches() {
   git fetch --all --prune && git branch -D $(git branch -vv | grep ': gone]'|  grep -v "\*" | awk '{ print $1; }')
 }
