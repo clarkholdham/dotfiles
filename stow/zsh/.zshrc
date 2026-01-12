@@ -68,3 +68,6 @@ if [[ "$USER" = "user" ]]; then
   # if the user is user, then it's a container
   source /workspaces/ouster-perception/build/generators/x86_64/RelWithDebInfo/conanrun.sh
 fi
+
+# enable better vscode terminal integration https://code.visualstudio.com/docs/terminal/shell-integration
+[[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
