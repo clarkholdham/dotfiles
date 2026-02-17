@@ -63,6 +63,15 @@ bindkey '^j' history-beginning-search-backward
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# NVM (Node Version Manager) - optional, only if you do Node.js development
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Google Cloud SDK - optional, only if you use GCP
+if [ -f '/Users/clark.holdham/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/clark.holdham/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f '/Users/clark.holdham/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/clark.holdham/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+
 # run conanrun.sh if it exists, only run in dev containers
 if [[ "$USER" = "user" ]]; then
   # if the user is user, then it's a container

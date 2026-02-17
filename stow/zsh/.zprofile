@@ -1,3 +1,6 @@
+# Homebrew environment setup (macOS)
+eval "$(/opt/homebrew/bin/brew shellenv zsh)" 2>/dev/null || true
+
 # This function sets up the SSH agent and adds any common private keys.
 # Useful for vscode dev containers.
 function _setup_ssh_agent() {

@@ -1,5 +1,5 @@
 # dotfiles
-Dotfiles and setups scripts for Ubuntu
+Dotfiles and setup scripts for macOS and Ubuntu
 
 ## Setup
 
@@ -16,4 +16,10 @@ cd dotfiles
 
 3. Restart your terminal
 
-4. In first tmux session, run `prefix + I` to install plugins. See tmuux.conf for prefix key.
+4. In first tmux session, run `prefix + I` to install plugins. See tmux.conf for prefix key.
+
+## Supported Platforms
+- macOS (with Homebrew)
+- Ubuntu/Debian (with apt)
+
+The setup script automatically detects your OS and installs dependencies using the appropriate package manager.
