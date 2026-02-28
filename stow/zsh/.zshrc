@@ -13,8 +13,14 @@ alias dcdv="docker compose down --volumes"
 alias dcp="docker compose pull"
 alias dl="docker logs"
 alias ls="ls -lah"
+alias gfa='git fetch --all --tags --prune'
 clean_branches() {
   git fetch --all --prune && git branch -D $(git branch -vv | grep ': gone]'|  grep -v "\*" | awk '{ print $1; }')
+}
+
+gfr() {
+  local default_branch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+  git fetch origin $default_branch && git rebase origin/$default_branch
 }
 
 # load zgenom
@@ -80,3 +86,7 @@ fi
 
 # enable better vscode terminal integration https://code.visualstudio.com/docs/terminal/shell-integration
 [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
