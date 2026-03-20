@@ -41,7 +41,11 @@ if [ "$OS" = "macos" ]; then
 fi
 if [ "$SHELL" != "$ZSH_PATH" ]; then
     echo "Setting zsh as default shell..."
-    chsh -s "$ZSH_PATH"
+    if [ "$OS" = "macos" ]; then
+        chsh -s "$ZSH_PATH"
+    else
+        sudo usermod -s "$ZSH_PATH" "$(whoami)"
+    fi
 fi
 
 # install tmux plugin manager
