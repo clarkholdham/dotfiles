@@ -1,0 +1,86 @@
+#!/bin/bash
+
+set -e
+
+mode=${1:-up}
+workspace_folder=${2:-.}
+container_user=${3:-user}
+
+dotfiles_repo="https://github.com/clarkholdham/dotfiles.git"
+
+additional_features="{
+    \"ghcr.io/devcontainers-extra/features/apt-packages:1\": {
+      \"packages\": \"ca-certificates,curl,git,git-lfs,htop,pax-utils,ssh,stow,sudo,tmux,vim,xsel,zsh\",
+      \"ppas\": \"ppa:git-core/ppa\"
+    },
+    \"ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2\": {
+      \"shallowClone\": true
+    },
+    \"ghcr.io/jmdaly/features/homebrew-packages:1\": {
+      \"packages\": \"jira-cli,glab,avivsinai/tap/jk\"
+    }
+}"
+
+build_devcontainer() {
+    local workspace_folder=$1
+
+    echo "Building devcontainer with workspace folder: ${workspace_folder}"
+
+    devcontainer build --no-cache --workspace-folder ${workspace_folder} \
+        --additional-features "${additional_features}"
+}
+
+start_devcontainer() {
+    local workspace_folder=$1
+    local container_user=$2
+
+    echo "Starting devcontainer with workspace folder: ${workspace_folder}"
+
+    devcontainer up --workspace-folder ${workspace_folder} \
+        --dotfiles-repository ${dotfiles_repo} \
+        --additional-features "${additional_features}" \
+        --mount type=bind,source=/run/host-services/ssh-auth.sock,target=/run/host-services/ssh-auth.sock \
+        --mount type=bind,source=$HOME/devcontainer_data/.local,target=/home/${container_user}/.local \
+        --mount type=bind,source=$HOME/devcontainer_data/.cache,target=/home/${container_user}/.cache \
+        --mount type=bind,source=$HOME/devcontainer_data/.copilot,target=/home/${container_user}/.copilot \
+        --mount type=bind,source=$HOME/.local/state/nvim,target=/home/${container_user}/.local/state/nvim
+
+    # Run a few commands to set up the environment for me.
+    devcontainer exec --workspace-folder ${workspace_folder} \
+        /bin/bash -c "sudo chsh ${container_user} -s /usr/bin/zsh"
+}
+
+exec_devcontainer() {
+    local workspace_folder=$1
+
+    shell="zsh"
+
+    devcontainer exec --workspace-folder ${workspace_folder} \
+        --remote-env TERM=$TERM \
+        --remote-env SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock \
+        --remote-env SHELL=$shell \
+        ${shell}
+}
+
+stop_devcontainer() {
+    docker compose -f .devcontainer/compose.yaml stop
+}
+
+remove_devcontainer() {
+    docker compose -f .devcontainer/compose.yaml down
+}
+
+if [ "$mode" == "up" ]; then
+    start_devcontainer $workspace_folder $container_user
+elif [ "$mode" == "build" ]; then
+    build_devcontainer $workspace_folder
+elif [ "$mode" == "exec" ]; then
+    exec_devcontainer $workspace_folder
+elif [ "$mode" == "stop" ]; then
+    stop_devcontainer $workspace_folder
+elif [ "$mode" == "down" ]; then
+    remove_devcontainer $workspace_folder
+else
+    echo "Invalid command: $1"
+    exit 1
+fi
