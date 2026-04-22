@@ -24,11 +24,11 @@ if [ "$OS" = "macos" ]; then
         echo "Homebrew not found. Installing Homebrew..."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
-    brew install stow zsh tmux
+    brew install stow zsh tmux npm
 else
     # Linux (Ubuntu/Debian)
     sudo apt-get update
-    sudo apt-get -y install stow zsh tmux keychain
+    sudo apt-get -y install stow zsh tmux keychain npm
 fi
 
 # Set zsh as default shell
@@ -68,6 +68,16 @@ if ! command -v mise &> /dev/null && [ ! -f ~/.local/bin/mise ]; then
     echo "mise installed at ~/.local/bin/mise"
 else
     echo "mise already installed"
+fi
+
+# Install Dev Container CLI
+# https://github.com/devcontainers/cli
+if ! command -v devcontainer &> /dev/null; then
+    echo "Installing Dev Container CLI..."
+    npm install -g @devcontainers/cli
+    echo "Dev Container CLI installed"
+else
+    echo "Dev Container CLI already installed"
 fi
 
 # Set up all of the configs:

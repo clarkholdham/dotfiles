@@ -5,6 +5,9 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Ensure ~/.local/bin is in PATH for dotfiles scripts
+export PATH="$HOME/.local/bin:$PATH"
+
 #aliases
 alias nv=nvim
 alias dcud="docker compose up -d"
