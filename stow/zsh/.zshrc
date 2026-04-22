@@ -81,12 +81,6 @@ export NVM_DIR="$HOME/.nvm"
 if [ -f '/Users/clark.holdham/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/clark.holdham/Downloads/google-cloud-sdk/path.zsh.inc'; fi
 if [ -f '/Users/clark.holdham/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/clark.holdham/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
 
-# run conanrun.sh if it exists, only run in dev containers
-if [[ "$USER" = "user" ]]; then
-  # if the user is user, then it's a container
-  source /workspaces/ouster-perception/build/generators/x86_64/RelWithDebInfo/conanrun.sh
-fi
-
 # enable better vscode terminal integration https://code.visualstudio.com/docs/terminal/shell-integration
 [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
 
