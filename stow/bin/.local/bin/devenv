@@ -6,6 +6,17 @@ mode=${1:-up}
 workspace_folder=${2:-.}
 container_user=${3:-user}
 
+# Find the real devcontainer CLI (installed via npm) to avoid recursion
+# The wrapper script itself is at ~/.local/bin/devcontainer, so we need to find the actual CLI
+REAL_DEVCONTAINER=$(find ~/.nvm/versions/node/*/bin/devcontainer 2>/dev/null | head -1)
+if [ -z "$REAL_DEVCONTAINER" ]; then
+    echo "Error: devcontainer CLI not found. Install with: npm install -g @devcontainers/cli"
+    exit 1
+fi
+
+# Create an alias to avoid calling ourselves recursively
+alias devcontainer-cli="$REAL_DEVCONTAINER"
+
 dotfiles_repo="https://github.com/clarkholdham/dotfiles.git"
 
 additional_features="{
