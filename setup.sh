@@ -58,6 +58,18 @@ if [ ! -d ~/.zgenom ]; then
     git clone https://github.com/jandamm/zgenom.git "${HOME}/.zgenom"
 fi
 
+# Install mise (polyglot runtime manager)
+# https://mise.jdx.dev
+if ! command -v mise &> /dev/null && [ ! -f ~/.local/bin/mise ]; then
+    echo "Installing mise..."
+    curl -fsSL https://mise.run | bash 2>/dev/null
+    # Add to PATH for this session
+    export PATH="$HOME/.local/bin:$PATH"
+    echo "mise installed at ~/.local/bin/mise"
+else
+    echo "mise already installed"
+fi
+
 # Set up all of the configs:
 cd "${base}/stow"
 

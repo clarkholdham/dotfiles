@@ -1,6 +1,6 @@
 [user]
 	name = Clark Holdham
-	email = clark.holdham@gmail.com
+	email = clark.holdham@ouster.io
 
 ; include only if a remote within the ouster namespace is present
 [includeIf "hasconfig:remote.*.url:git@gitlab.com:ouster/*/**"]
@@ -14,3 +14,6 @@
 
 [init]
 	defaultBranch = main
+[credential "https://gitlab.com"]
+	helper = 
+	helper = !/usr/bin/glab auth git-credential
