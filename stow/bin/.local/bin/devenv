@@ -63,22 +63,40 @@ start_devcontainer() {
 
 exec_devcontainer() {
     local workspace_folder=$1
+    shift  # Remove workspace_folder from arguments
+    local shell="zsh"
 
-    shell="zsh"
-
-    devcontainer exec --workspace-folder ${workspace_folder} \
-        --remote-env TERM=$TERM \
-        --remote-env SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock \
-        --remote-env SHELL=$shell \
-        ${shell}
+    # If no command provided, launch interactive shell
+    if [ $# -eq 0 ]; then
+        devcontainer exec --workspace-folder ${workspace_folder} \
+            --remote-env TERM=$TERM \
+            --remote-env SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock \
+            --remote-env SHELL=$shell \
+            ${shell}
+    else
+        # Run provided command
+        devcontainer exec --workspace-folder ${workspace_folder} \
+            --remote-env TERM=$TERM \
+            --remote-env SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock \
+            --remote-env SHELL=$shell \
+            /bin/bash -c "$@"
+    fi
 }
 
 stop_devcontainer() {
-    docker compose -f .devcontainer/compose.yaml stop
+    local workspace_folder=$1
+    
+    echo "Stopping devcontainer for workspace folder: ${workspace_folder}"
+    
+    docker compose -f "${workspace_folder}/.devcontainer/compose.yaml" stop
 }
 
 remove_devcontainer() {
-    docker compose -f .devcontainer/compose.yaml down
+    local workspace_folder=$1
+    
+    echo "Removing devcontainer for workspace folder: ${workspace_folder}"
+    
+    docker compose -f "${workspace_folder}/.devcontainer/compose.yaml" down
 }
 
 if [ "$mode" == "up" ]; then
@@ -86,7 +104,8 @@ if [ "$mode" == "up" ]; then
 elif [ "$mode" == "build" ]; then
     build_devcontainer $workspace_folder
 elif [ "$mode" == "exec" ]; then
-    exec_devcontainer $workspace_folder
+    shift 2  # Remove mode and workspace_folder, keeping command arguments
+    exec_devcontainer $workspace_folder "$@"
 elif [ "$mode" == "stop" ]; then
     stop_devcontainer $workspace_folder
 elif [ "$mode" == "down" ]; then
