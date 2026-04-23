@@ -3,8 +3,25 @@
 set -e
 
 mode=${1:-up}
-workspace_folder=${2:-.}
-container_user=${3:-user}
+shift  # Remove mode from arguments
+
+workspace_folder="."
+container_user="user"
+
+# For most modes, extract workspace_folder and container_user from remaining args
+# For exec mode, check if first arg is a flag like -w
+if [ "$mode" != "exec" ]; then
+    workspace_folder=${1:-.}
+    shift 2>/dev/null || true
+    container_user=${1:-user}
+else
+    # For exec, check for -w flag to specify workspace folder
+    if [ "$1" = "-w" ]; then
+        shift
+        workspace_folder=${1:-.}
+        shift
+    fi
+fi
 
 # Find the real devcontainer CLI (installed via npm) to avoid recursion
 # The wrapper script itself is at ~/.local/bin/devcontainer, so we need to find the actual CLI
@@ -79,7 +96,7 @@ exec_devcontainer() {
             --remote-env TERM=$TERM \
             --remote-env SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock \
             --remote-env SHELL=$shell \
-            /bin/bash -c "$@"
+            /bin/bash -c "$*"
     fi
 }
 
@@ -104,13 +121,12 @@ if [ "$mode" == "up" ]; then
 elif [ "$mode" == "build" ]; then
     build_devcontainer $workspace_folder
 elif [ "$mode" == "exec" ]; then
-    shift 2  # Remove mode and workspace_folder, keeping command arguments
     exec_devcontainer $workspace_folder "$@"
 elif [ "$mode" == "stop" ]; then
     stop_devcontainer $workspace_folder
 elif [ "$mode" == "down" ]; then
     remove_devcontainer $workspace_folder
 else
-    echo "Invalid command: $1"
+    echo "Invalid command: $mode"
     exit 1
 fi
