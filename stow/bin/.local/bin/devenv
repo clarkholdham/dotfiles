@@ -8,14 +8,14 @@ shift  # Remove mode from arguments
 workspace_folder="."
 container_user="user"
 
-# For most modes, extract workspace_folder and container_user from remaining args
-# For exec mode, check if first arg is a flag like -w
+# For most modes, extract workspace_folder and container_user from remaining args.
+# For exec mode, -w overrides the directory to cd into inside the container.
 if [ "$mode" != "exec" ]; then
     workspace_folder=${1:-.}
     shift 2>/dev/null || true
     container_user=${1:-user}
 else
-    # For exec, check for -w flag to specify workspace folder
+    # For exec, -w sets the host path to cd into inside the container (translated automatically)
     if [ "$1" = "-w" ]; then
         shift
         workspace_folder=${1:-.}
@@ -49,6 +49,56 @@ additional_features="{
     }
 }"
 
+# Find the workspace folder that contains .devcontainer/.
+# Strategy: check the primary git worktree first. Since .devcontainer is tracked in git it
+# exists in every worktree, so walking up the directory tree would always find the worktree's
+# own copy — we must prefer the primary worktree to ensure all worktrees share one container.
+# Fall back to walking up for non-git repos or repos without a main-worktree devcontainer.
+find_devcontainer_root() {
+    local path
+    path=$(realpath "${1:-.}")
+
+    # Prefer the primary worktree (first line of `git worktree list`)
+    local main_worktree
+    main_worktree=$(git -C "$path" worktree list 2>/dev/null | head -1 | awk '{print $1}')
+    if [[ -n "$main_worktree" && -d "$main_worktree/.devcontainer" ]]; then
+        echo "$main_worktree"
+        return 0
+    fi
+
+    # Fall back: walk up the directory tree (handles non-git repos)
+    local check="$path"
+    while [[ "$check" != "/" ]]; do
+        if [[ -d "$check/.devcontainer" ]]; then
+            echo "$check"
+            return 0
+        fi
+        check=$(dirname "$check")
+    done
+
+    # No .devcontainer found — return original path and let devcontainer CLI surface the error
+    echo "$path"
+}
+
+# Translate a host path to its equivalent inside the container.
+# devcontainer.json always mounts source=${env:HOME},target=/home/host so
+# any path under $HOME is reliably accessible at /home/host/... regardless
+# of whether the container was started by devenv or VS Code.
+host_to_container_path() {
+    local host_path="$1"
+    echo "${host_path/#$HOME//home/host}"
+}
+
+# Resolve the invocation path, find the devcontainer root, and derive the in-container cwd
+invocation_path=$(realpath "${workspace_folder:-.}")
+devcontainer_root=$(find_devcontainer_root "$invocation_path")
+container_cwd=$(host_to_container_path "$invocation_path")
+
+if [[ "$devcontainer_root" != "$invocation_path" ]]; then
+    echo "ℹ️  Worktree detected — using devcontainer from: $devcontainer_root"
+    echo "   Working directory inside container: $container_cwd"
+fi
+
 build_devcontainer() {
     local workspace_folder=$1
 
@@ -67,11 +117,7 @@ start_devcontainer() {
     devcontainer up --workspace-folder ${workspace_folder} \
         --dotfiles-repository ${dotfiles_repo} \
         --additional-features "${additional_features}" \
-        --mount type=bind,source=/run/host-services/ssh-auth.sock,target=/run/host-services/ssh-auth.sock \
-        --mount type=bind,source=$HOME/devcontainer_data/.local,target=/home/${container_user}/.local \
-        --mount type=bind,source=$HOME/devcontainer_data/.cache,target=/home/${container_user}/.cache \
-        --mount type=bind,source=$HOME/devcontainer_data/.copilot,target=/home/${container_user}/.copilot \
-        --mount type=bind,source=$HOME/.local/state/nvim,target=/home/${container_user}/.local/state/nvim
+        --mount type=bind,source=${SSH_AUTH_SOCK},target=/run/host-services/ssh-auth.sock
 
     # Run a few commands to set up the environment for me.
     devcontainer exec --workspace-folder ${workspace_folder} \
@@ -80,23 +126,24 @@ start_devcontainer() {
 
 exec_devcontainer() {
     local workspace_folder=$1
-    shift  # Remove workspace_folder from arguments
+    local container_cwd=$2
+    shift 2
     local shell="zsh"
 
-    # If no command provided, launch interactive shell
+    # If no command provided, launch interactive shell in the current worktree directory
     if [ $# -eq 0 ]; then
-        devcontainer exec --workspace-folder ${workspace_folder} \
+        devcontainer exec --workspace-folder "${workspace_folder}" \
             --remote-env TERM=$TERM \
             --remote-env SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock \
             --remote-env SHELL=$shell \
-            ${shell}
+            /bin/bash -c "cd '${container_cwd}' && exec ${shell}"
     else
-        # Run provided command
-        devcontainer exec --workspace-folder ${workspace_folder} \
+        # Run provided command inside the current worktree directory
+        devcontainer exec --workspace-folder "${workspace_folder}" \
             --remote-env TERM=$TERM \
             --remote-env SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock \
             --remote-env SHELL=$shell \
-            /bin/bash -c "$*"
+            /bin/bash -c "cd '${container_cwd}' && $(printf '%q ' "$@")"
     fi
 }
 
@@ -117,15 +164,15 @@ remove_devcontainer() {
 }
 
 if [ "$mode" == "up" ]; then
-    start_devcontainer $workspace_folder $container_user
+    start_devcontainer "$devcontainer_root" "$container_user"
 elif [ "$mode" == "build" ]; then
-    build_devcontainer $workspace_folder
+    build_devcontainer "$devcontainer_root"
 elif [ "$mode" == "exec" ]; then
-    exec_devcontainer $workspace_folder "$@"
+    exec_devcontainer "$devcontainer_root" "$container_cwd" "$@"
 elif [ "$mode" == "stop" ]; then
-    stop_devcontainer $workspace_folder
+    stop_devcontainer "$devcontainer_root"
 elif [ "$mode" == "down" ]; then
-    remove_devcontainer $workspace_folder
+    remove_devcontainer "$devcontainer_root"
 else
     echo "Invalid command: $mode"
     exit 1
