@@ -23,3 +23,10 @@ cd dotfiles
 - Ubuntu/Debian (with apt)
 
 The setup script automatically detects your OS and installs dependencies using the appropriate package manager.
+
+## Included Configs
+- Zsh config (`~/.zshrc` and related files)
+- Tmux config (`~/.tmux.conf`)
+- Git config
+- Powerlevel10k config
+- GitHub Copilot local instructions (`~/.copilot/copilot-instructions.md`)
