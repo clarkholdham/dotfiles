@@ -9,7 +9,7 @@ The user is **Clark Holdham** (initials: `ch`).
 
 # Temporary Files
 
-- ALWAYS use `./github/tmp/` for temporary files — NEVER use `/tmp/` or the repo root.
+- ALWAYS use `./.github/tmp/` for temporary files — NEVER use `/tmp/` or the repo root.
 
 # Dot Folders
 
