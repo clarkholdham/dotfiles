@@ -1,7 +1,3 @@
----
-applyTo: '**'
----
-
 # Identity
 
 The user is **Clark Holdham** (initials: `ch`).
@@ -64,8 +60,7 @@ Never push a branch that is behind its upstream — this is the leading cause of
 
 When the user provides context about which branch or MR to work on within the same chat session (especially in chain-branch scenarios):
 - **Always verify** you are operating on the correct branch before making any changes.
-- **Explicitly confirm** the branch name with the user if there's any ambiguity (e.g., "I'll work on `ch/OD-1234-fix-login-bug-2`").
-- If the user asks to work on multiple parts of a chain in the same conversation, **ensure you switch branches correctly** and do not mix changes across branches.
+- **Explicitly confirm** the branch name with the user if there's any ambiguity.
 - Reference the specific branch/MR in your response so the user can verify your context is correct.
 
 # Creating Merge Requests (MRs)
@@ -111,7 +106,7 @@ EOF
 # External Tool Integration
 
 **IMPORTANT:** When interacting with Jira, Jenkins, GitLab, or other external services:
-- **USE SKILLS and MCPs** available in the environment (e.g., `jira-skill`, `glab-skill`, `jk` skill)
+- **USE SKILLS and MCPs** available in the environment
 - **DO NOT use APIs directly** or construct raw HTTP requests
 - Skills provide abstraction, authentication, and best practices built for these tools
 - Check available skills before writing any custom integration code
