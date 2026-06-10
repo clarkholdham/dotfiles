@@ -12,6 +12,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS
     OS="macos"
     echo "Detected macOS"
+    # Request sudo upfront so password is cached and we don't get stuck mid-script
+    echo "This script requires sudo privileges. Please authenticate:"
+    sudo -v
 else
     OS="linux"
     echo "Detected Linux"
