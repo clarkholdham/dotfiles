@@ -97,3 +97,9 @@ if [ -x "$HOME/.local/bin/mise" ]; then
 elif command -v mise &> /dev/null; then
   eval "$(mise activate zsh)"
 fi
+
+# Argo Workflows - fetch GCP auth token
+argo-auth() {
+  export ARGO_TOKEN="Bearer $(gcloud auth print-access-token)"
+  echo "✓ Argo token set (valid for ~1 hour)"
+}
